@@ -27,17 +27,17 @@ class Lead(models.Model):
 class Agent(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     organization = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=20)
-    last_name = models.CharField(max_length=20)
 
     def __str__(self):
         return self.user.username
 
 
+# Using django's signals (post_save here) to create a UserProfile when a new User is created
 def post_user_created_signal(sender, instance, created, **kwargs):
     print(instance, created)
     if created:
         UserProfile.objects.create(user=instance)
 
 
+# Connects the post_save signal to the function above
 post_save.connect(post_user_created_signal, sender=User)
