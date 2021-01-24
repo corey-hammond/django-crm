@@ -6,6 +6,7 @@ from django.views import generic
 
 from .models import Lead, Agent
 from .forms import LeadModelForm, CustomUserCreationForm
+from agents.mixins import OrganizerAndLoginRequiredMixin
 
 
 class SignupView(generic.CreateView):
@@ -26,8 +27,27 @@ class LandingPageView(generic.TemplateView):
 
 class LeadListView(LoginRequiredMixin, generic.ListView):
     template_name = "leads/lead_list.html"
-    queryset = Lead.objects.all()
     context_object_name = "leads"
+
+    def get_queryset(self):
+        user = self.request.user
+
+        # initial queryset of organization
+        if user.is_organizer:
+            queryset = Lead.objects.filter(organization=user.userprofile)
+        else:
+            queryset = Lead.objects.filter(
+                organization=user.agent.organization)
+            # filter leads for current agent logged in
+            queryset = queryset.filter(agent__user=user)
+            print(queryset)
+
+            """ I believe that the first queryset in the else statement is
+            the same as doing this: queryset = Lead.objects.filter(agent__user=user)
+            which is the same as the second queryset...I need to test if this is redundant
+            or if there is a reason this was done this way. """
+
+        return queryset
 
 
 # def lead_list(request):
@@ -38,8 +58,21 @@ class LeadListView(LoginRequiredMixin, generic.ListView):
 
 class LeadDetailView(LoginRequiredMixin, generic.DetailView):
     template_name = "leads/lead_detail.html"
-    queryset = Lead.objects.all()
     context_object_name = "lead"
+
+    def get_queryset(self):
+        user = self.request.user
+
+        # initial queryset of organization
+        if user.is_organizer:
+            queryset = Lead.objects.filter(organization=user.userprofile)
+        else:
+            queryset = Lead.objects.filter(
+                organization=user.agent.organization)
+            # filter leads for current agent logged in
+            queryset = queryset.filter(agent__user=user)
+
+        return queryset
 
 
 # def lead_detail(request, pk):
@@ -48,7 +81,7 @@ class LeadDetailView(LoginRequiredMixin, generic.DetailView):
 #     return render(request, "leads/lead_detail.html", context)
 
 
-class LeadCreateView(LoginRequiredMixin, generic.CreateView):
+class LeadCreateView(OrganizerAndLoginRequiredMixin, generic.CreateView):
     template_name = "leads/lead_create.html"
     form_class = LeadModelForm
 
@@ -78,10 +111,15 @@ class LeadCreateView(LoginRequiredMixin, generic.CreateView):
 #     return render(request, "leads/lead_create.html", context)
 
 
-class LeadUpdateView(LoginRequiredMixin, generic.UpdateView):
+class LeadUpdateView(OrganizerAndLoginRequiredMixin, generic.UpdateView):
     template_name = "leads/lead_update.html"
     form_class = LeadModelForm
-    queryset = Lead.objects.all()
+
+    def get_queryset(self):
+        user = self.request.user
+
+        # initial queryset of organization
+        return Lead.objects.filter(organization=user.userprofile)
 
     def get_success_url(self):
         return reverse("leads:lead-list")
@@ -104,9 +142,14 @@ class LeadUpdateView(LoginRequiredMixin, generic.UpdateView):
 #     return render(request, "leads/lead_update.html", context)
 
 
-class LeadDeleteView(LoginRequiredMixin, generic.DeleteView):
+class LeadDeleteView(OrganizerAndLoginRequiredMixin, generic.DeleteView):
     template_name = "leads/lead_delete.html"
-    queryset = Lead.objects.all()
+
+    def get_queryset(self):
+        user = self.request.user
+
+        # initial queryset of organization
+        return Lead.objects.filter(organization=user.userprofile)
 
     def get_success_url(self):
         return reverse("leads:lead-list")
