@@ -34,7 +34,7 @@ class CustomUserCreationForm(UserCreationForm):
 class AssignAgentForm(forms.Form):
     agent = forms.ModelChoiceField(queryset=Agent.objects.none())
 
-    """Every time the form is rendered we are dynamically updating the field based
+    """Every time the form is rendered we are dynamically updating the form field based
     on the request user """
 
     def __init__(self, *args, **kwargs):
@@ -42,3 +42,11 @@ class AssignAgentForm(forms.Form):
         agents = Agent.objects.filter(organization=request.user.userprofile)
         super(AssignAgentForm, self).__init__(*args, **kwargs)
         self.fields["agent"].queryset = agents
+
+
+class LeadCategoryUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Lead
+        fields = (
+            'category',
+        )
