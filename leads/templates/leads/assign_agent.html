@@ -1,12 +1,17 @@
 {% extends "base.html" %}
+{% load tailwind_filters %}
 
 {% block content %}
+<div class="max-w-lg mx-auto">
   <a href="{% url 'leads:lead-list' %}">Go back to leads</a>
-  <hr />
-  <h1>Assign an agent to this lead</h1>
-  <form method="post">
+  <div class="py-5 border-t border-gray-200">
+    <h1 class="text-2xl text-gray-800">Assign an agent to this lead</h1>
+  </div>
+  <form method="post" class="mb-5">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Submit</button>
+    <button type="submit" class="mt-5 w-full bg-blue-500 text-white hover:bg-blue-600 px-3 py-2 rounded-md">Submit</button>
   </form>
+</div>
+
 {% endblock %}
