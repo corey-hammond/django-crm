@@ -155,6 +155,5 @@ if not DEBUG:
 
     ALLOWED_HOSTS = ["*"]
 
-
-# Activate Django-Heroku.
-django_heroku.settings(locals())
+    # Activate Django-Heroku.
+    django_heroku.settings(locals())
