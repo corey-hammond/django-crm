@@ -1,3 +1,4 @@
+import django_heroku
 from pathlib import Path
 import environ
 
@@ -153,3 +154,7 @@ if not DEBUG:
     X_FRAME_OPTIONS = "DENY"
 
     ALLOWED_HOSTS = ["*"]
+
+
+# Activate Django-Heroku.
+django_heroku.settings(locals())
