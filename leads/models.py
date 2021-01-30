@@ -18,8 +18,8 @@ class UserProfile(models.Model):
 class Lead(models.Model):
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
-    email = models.EmailField(max_length=254, default="na@na.com")
-    phone = models.IntegerField(default=9999999999)
+    email = models.EmailField()
+    phone = models.BigIntegerField(default=0)
     age = models.IntegerField(default=0)
     organization = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     agent = models.ForeignKey(
@@ -28,7 +28,6 @@ class Lead(models.Model):
         "Category", related_name="leads", null=True, blank=True, on_delete=models.SET_NULL)
     description = models.TextField()
     date_added = models.DateTimeField(auto_now_add=True)
-
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
